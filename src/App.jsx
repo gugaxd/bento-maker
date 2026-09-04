@@ -1,4 +1,15 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import Header from "./components/Header.jsx";
+import Footer from "./components/Footer.jsx";
+import { MONO, SANS } from "./theme.js";
+
+/* Tokens de cor lidos via var() — o Header e o Footer ficam em sincronia com o
+   alternador de tema do próprio .bt, sem duplicar a paleta escuro/claro. */
+const CSS_THEME = {
+  ink: "var(--ink)", ink2: "var(--ink2)", line: "var(--line)",
+  text: "var(--text)", muted: "var(--muted)",
+  cyan: "var(--cyan)", sobreCyan: "var(--sobre-cyan)",
+};
 
 /* ==========================================================================
    Geometria — o empacotamento é calculado em JS, então tela e exportação
@@ -73,8 +84,8 @@ const CSS = `
   src: url(data:font/woff2;base64,d09GMgABAAAAAASsABAAAAAACMwAAARQAAEAxQAAAAAAAAAAAAAAAAAAAAAAAAAAGiIbIBwqBmA/U1RBVEQAZBEICoYohSsBNgIkAywLGAAEIAWELgcgDAcbIQdIHoVxmxNCqk7jO5N2q1KI57/fz3ftc1/yAbgEwlbVEat6kiQbHak6VWXf6Xj2ZZ0f3tNemgzXDFTSEYUHMIWyS9MDiPaoP5JieA+gKSSWwJQncgeX07sHfpCxAPC/MRbg08bmoAgD6q0B9NriZW2O0riAMIfD6buZ8qwTE0wDShMRTSf6JkQwaVsI5Ly0pAYcdTASEEw6Jg6HmczlUSdrAj8S2XVFVgPYUcM6CS68O/cgNQmgpuwwFONANSCyv3nxUlkNnIB9bPv+7yztY1gAgfziHAGwDxUxrrCMgyM4z9QaFgHuP+40ID4QnXkIZL4aADRR8QUIKDQsQwXLMFeBeW5Q7OtC0aMx2JHY14miZ4Sv9a2wzEILzDM3hDyLyEhziCmwCsySHshdANABSokmokQ4PuM5H4NhWOSym5urz61JVisy0oZPvhuNjLzFnXQhiLvalqwGDJauxXGYHFpDttypm3x9d+i6c9xJV2BwtHOSlQRuD+ds14a7wTuMymZDRlqtttROwABHOsf2MpoRXk6I8yoPrsi2+io++XogvoReWl/XjPfY4RheV0/hKA5ThomaAjWJjgxqU79eLfbP5l8NcT18LZUt97Dw9aNMP3IHTA2tpxCEi+B5EHDJYOEx9/QTnnMlLl4UV9Zb25LAd8pYyzqdEjXEwtTmyVqisowDdB0DY0bJ3e1UgWnioAejK3khLZFub/iSxSFEbETQGbg0lXMrcZ5swI0B8X0rU4tkRlGhpVhZzjQK2zSJgtgoMUFGSQUxiW11TLSEJKPF+NzAd6qY4fPNJaVF/czCEoWpKN8g5vrtLCmLjpTkp0U/i+anBpNRgpsx8ey1Qdf5ytZEWDw7rfSn87TT728MuHH/5G+53EkM5K8BRUxpbGpOZdKQjU28zHY1Qwf0dxGlidMzBKVyGDArShdnpAcJOMtrSyfU8LJaKA4GUJni7Cz5bNibUvbjSyylZRK2P19RbGmL2LJSiaWfWh3zIlqcnl5Kfjbmk++a6kpKog7FivTlka98S3Ifw89kgU9owfdaqnbUgFGjqFFvAzceCMxTAeD5Kwji/Qj819521/z/jij6Dj7btgQA8J3oHPB//i3AtqFX0Vcg/Npk94HAHWPeyZxM1QgIqUTh1QREEfzLQ1IbDWTlIOB/JkOBSDfYJw0Iptzl4BJMyGgjQsNWWdcHeAngcnHKIa7M+sE153zq7TiuZzPJbN+JKC0ImA4jOTduGcb5cMo0Z764WQQitF4DMbTUNFhhUiWXqjRhakCkFDmaWW1DhkFjUQj1UAFQF+5mlgtYsDRoDLMwcdMuY/Uyy8XDo6aNd2XRhdSNZsQjYUAxopiwCDUG6kXhLd/IGTV+W+HqyX4bLSGaQY8qFDULg06MFKRkydLkKVGqTI28hQYTMdY9wzDTopmEuZ2ZBOr9191Q/YUUWJ0MtLpVoRl1MkGB0ZUq079A/u/DpgIAAAA=) format("woff2");
 }
 .bt {
-  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: ${SANS};
+  --mono: ${MONO};
   --radius: 2px;
   --painel: 312px;
   --barra: 46px;
@@ -111,17 +122,9 @@ const CSS = `
   display:flex; align-items:center; gap:8px; padding: 0 18px;
   background: var(--ink2); border-bottom: 1px solid var(--line);
 }
-.bt .marca { display:flex; align-items:center; gap:11px; margin-right:auto; }
-.bt .marca .logo { height:17px; width:auto; display:block; color: var(--text); flex:none; }
-.bt .marca .risco { width:1px; align-self:stretch; margin:11px 0; background: var(--line); }
-.bt .marca .nome {
-  font-family: "Host Grotesk BM", var(--sans);
-  font-weight: 600; font-size: 16px; letter-spacing: .015em;
-  color: var(--text); line-height: 1;
-}
 .bt .status {
   font-family: var(--mono); font-size:10.5px; letter-spacing:.06em;
-  color: var(--muted); margin-right:8px; white-space:nowrap;
+  color: var(--muted); margin-right:auto; white-space:nowrap;
 }
 
 /* --- painéis --- */
@@ -329,6 +332,7 @@ function Deslize({ label, value, set, min, max, step, acento = "var(--mag)" }) {
 
 export default function BentoGenerator() {
   const [tema, setTema] = useState("escuro");
+  const trocarTema = () => setTema((t) => (t === "escuro" ? "claro" : "escuro"));
   const [cfg, setCfg] = useState({
     preset: "free", docW: 1600, docH: 1200, fixH: false, zoom: "fit",
     cols: 4, rowH: 380, autoRow: true, gap: 16, pad: 24, radius: 2,
@@ -628,21 +632,8 @@ export default function BentoGenerator() {
       <style>{CSS}</style>
 
       <div className="barra">
-        <div className="marca">
-          <svg className="logo" viewBox="0 0 557.34 334.4" fill="currentColor" role="img" aria-label="Logo">
-            <path d="M557.34,167.21v167.19h-55.74v-111.47h-111.47v1.96c0,60.48-49.03,109.52-109.52,109.52h-1.94v-55.74h.1c30.73,0,55.63-24.91,55.63-55.63v-.1h-55.74v-55.72h55.74V0h55.72v167.21h167.21Z" />
-            <path d="M55.74,167.21h111.46v-55.74h55.74v222.93H0v-55.74h167.19v-55.74H0v-113.41C0,49.03,49.03,0,109.52,0h113.41v55.74h-111.39c-30.82,0-55.8,24.98-55.8,55.8v55.67Z" />
-          </svg>
-          <span className="risco" />
-          <span className="nome">bento maker</span>
-        </div>
         <div className="status">
           {Math.round(layout.docW)} × {Math.round(layout.docH)} px · {Math.round(layout.cellW)} px/cél · {Math.round(k * 100)}%
-        </div>
-        <div className="seg" style={{ marginRight: 8 }}>
-          {["escuro", "claro"].map((id) => (
-            <button key={id} data-on={tema === id ? "1" : "0"} onClick={() => setTema(id)}>{id}</button>
-          ))}
         </div>
         <select className="valor" value={escala} onChange={(e) => setEscala(Number(e.target.value))} title="Resolução de exportação">
           {[1, 2, 3, 4].map((s) => <option key={s} value={s}>{s}×</option>)}
@@ -658,6 +649,14 @@ export default function BentoGenerator() {
       <div className="corpo">
         {/* ---------------- painel esquerdo ---------------- */}
         <aside className="painel">
+          <Header
+            tool="bento maker"
+            theme={CSS_THEME}
+            fontFamily='"Host Grotesk BM", var(--sans)'
+            tema={tema}
+            onToggleTema={trocarTema}
+          />
+
           <Secao titulo="Imagens">
             <button
               className="arquivo" data-quente={quente ? "1" : "0"}
@@ -740,6 +739,14 @@ export default function BentoGenerator() {
               Reenquadramento arrastando dentro do bloco selecionado.
             </p>
           </Secao>
+
+          <Footer
+            theme={CSS_THEME}
+            links={[
+              { label: "Grid Maker", href: "https://gridmaker-iota.vercel.app/" },
+              { label: "Gradient Maker", href: "https://gradient-maker-peach.vercel.app/" },
+            ]}
+          />
         </aside>
 
         {/* ---------------- palco ---------------- */}
