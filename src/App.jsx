@@ -88,7 +88,6 @@ const CSS = `
   --mono: ${MONO};
   --radius: 2px;
   --painel: 312px;
-  --barra: 46px;
   --trilho: 2px;
   --polegar: 13px;
   --xadrez: 16px;
@@ -115,17 +114,6 @@ const CSS = `
   font-family: var(--sans); font-size: 13px;
 }
 .bt button, .bt input, .bt select { font-family: inherit; color: inherit; }
-
-/* --- barra superior --- */
-.bt .barra {
-  height: var(--barra); flex: none;
-  display:flex; align-items:center; gap:8px; padding: 0 18px;
-  background: var(--ink2); border-bottom: 1px solid var(--line);
-}
-.bt .status {
-  font-family: var(--mono); font-size:10.5px; letter-spacing:.06em;
-  color: var(--muted); margin-right:auto; white-space:nowrap;
-}
 
 /* --- painéis --- */
 .bt .corpo { display:flex; flex:1; min-height:0; }
@@ -631,21 +619,6 @@ export default function BentoGenerator() {
     <div className="bt" data-tema={tema}>
       <style>{CSS}</style>
 
-      <div className="barra">
-        <div className="status">
-          {Math.round(layout.docW)} × {Math.round(layout.docH)} px · {Math.round(layout.cellW)} px/cél · {Math.round(k * 100)}%
-        </div>
-        <select className="valor" value={escala} onChange={(e) => setEscala(Number(e.target.value))} title="Resolução de exportação">
-          {[1, 2, 3, 4].map((s) => <option key={s} value={s}>{s}×</option>)}
-        </select>
-        <button className="botao" onClick={() => exportRaster("png")} disabled={!tiles.length}>PNG</button>
-        <button className="botao" onClick={() => exportRaster("jpg")} disabled={!tiles.length}>JPG</button>
-        <button className="botao" onClick={exportSvg} disabled={!tiles.length}>SVG</button>
-        <button className="botao botao--primario" onClick={exportPdf} disabled={!tiles.length || busyPdf}>
-          {busyPdf ? "···" : "PDF"}
-        </button>
-      </div>
-
       <div className="corpo">
         {/* ---------------- painel esquerdo ---------------- */}
         <aside className="painel">
@@ -738,6 +711,30 @@ export default function BentoGenerator() {
               Reordenação pelo ⠿. Redimensionamento pelo canto inferior direito, com encaixe na malha.
               Reenquadramento arrastando dentro do bloco selecionado.
             </p>
+          </Secao>
+
+          <Secao titulo="Exportar">
+            <p className="medida" style={{ marginTop: 0 }}>
+              {Math.round(layout.docW)} × {Math.round(layout.docH)} px · {Math.round(layout.cellW)} px/cél · {Math.round(k * 100)}%
+            </p>
+            <div className="linha">
+              <label className="rotulo">Resolução</label>
+              <select
+                className="valor" value={escala} title="Resolução de exportação"
+                onChange={(e) => setEscala(Number(e.target.value))}
+              >
+                {[1, 2, 3, 4].map((s) => <option key={s} value={s}>{s}×</option>)}
+              </select>
+              <span className="unidade" />
+            </div>
+            <div className="botoes">
+              <button className="botao" onClick={() => exportRaster("png")} disabled={!tiles.length}>PNG</button>
+              <button className="botao" onClick={() => exportRaster("jpg")} disabled={!tiles.length}>JPG</button>
+              <button className="botao" onClick={exportSvg} disabled={!tiles.length}>SVG</button>
+              <button className="botao botao--primario" onClick={exportPdf} disabled={!tiles.length || busyPdf}>
+                {busyPdf ? "···" : "PDF"}
+              </button>
+            </div>
           </Secao>
 
           <Footer
