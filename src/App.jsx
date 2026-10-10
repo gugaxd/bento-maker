@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import Header from "./components/Header.jsx";
-import Footer from "./components/Footer.jsx";
 import { MONO, SANS } from "./theme.js";
 
-/* Tokens de cor lidos via var() — o Header e o Footer ficam em sincronia com o
+/* Menu do hub de ferramentas (projeto "hub" ao lado). Em dev aponta pro servidor local. */
+const HUB_URL = import.meta.env.DEV ? "http://localhost:5180/" : "https://design-tools-gugaxd.vercel.app/";
+
+/* Tokens de cor lidos via var() — o Header fica em sincronia com o
    alternador de tema do próprio .bt, sem duplicar a paleta escuro/claro. */
 const CSS_THEME = {
   ink: "var(--ink)", ink2: "var(--ink2)", line: "var(--line)",
@@ -624,6 +626,7 @@ export default function BentoGenerator() {
         <aside className="painel">
           <Header
             tool="bento maker"
+            homeHref={HUB_URL}
             theme={CSS_THEME}
             fontFamily='"Host Grotesk BM", var(--sans)'
             tema={tema}
@@ -737,13 +740,6 @@ export default function BentoGenerator() {
             </div>
           </Secao>
 
-          <Footer
-            theme={CSS_THEME}
-            links={[
-              { label: "Grid Maker", href: "https://gridmaker-iota.vercel.app/" },
-              { label: "Gradient Maker", href: "https://gradient-maker-peach.vercel.app/" },
-            ]}
-          />
         </aside>
 
         {/* ---------------- palco ---------------- */}

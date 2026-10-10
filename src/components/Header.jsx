@@ -1,27 +1,32 @@
 import { SANS } from "../theme.js";
 
 /* Cabeçalho do app: logo do estúdio + nome da ferramenta + alternador de tema.
-   Genérico — nome e fonte do título vêm por props, sem nada específico da ferramenta. */
-export default function Header({ tool, theme, fontFamily = SANS, tema, onToggleTema }) {
+   Genérico — nome e fonte do título vêm por props, sem nada específico da ferramenta.
+   Com `homeHref`, a marca vira link e aparece o botão de voltar ao menu do hub. */
+export default function Header({ tool, theme, fontFamily = SANS, tema, onToggleTema, homeHref }) {
   const C = theme;
+  const Marca = homeHref ? "a" : "div";
+  const marcaProps = homeHref ? { href: homeHref, title: "Todas as ferramentas" } : {};
   return (
     <div className="brand">
       <style>{`
         .brand{padding:18px 18px 14px;border-bottom:1px solid ${C.line};position:sticky;top:0;
           background:${C.ink2};z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px}
-        .marca{display:flex;align-items:center;gap:11px;min-width:0}
+        .marca{display:flex;align-items:center;gap:11px;min-width:0;text-decoration:none}
+        a.marca:focus-visible{outline:2px solid ${C.cyan};outline-offset:4px}
+        .acoes{display:flex;gap:6px;flex:none}
         .marca .logo{height:20px;width:auto;display:block;color:${C.text};flex:none}
         .marca .risco{width:1px;align-self:stretch;margin:1px 0;background:${C.line};flex:none}
         .brand h1{margin:0;font-family:${fontFamily};font-size:19px;font-weight:600;
           letter-spacing:-.005em;text-transform:lowercase;line-height:1;color:${C.text}}
-        .tema{flex:0 0 auto;width:30px;height:30px;padding:6px;background:${C.ink};
+        .tema{flex:0 0 auto;display:block;width:30px;height:30px;padding:6px;background:${C.ink};
           border:1px solid ${C.line};border-radius:2px;cursor:pointer;color:${C.muted}}
         .tema:hover{background:${C.cyan};border-color:${C.cyan};color:${C.sobreCyan}}
         .tema:focus-visible{outline:2px solid ${C.cyan};outline-offset:1px}
         .tema svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;
           stroke-width:1.7}
       `}</style>
-      <div className="marca">
+      <Marca className="marca" {...marcaProps}>
         <svg
           className="logo"
           viewBox="0 0 557.34 334.4"
@@ -34,7 +39,18 @@ export default function Header({ tool, theme, fontFamily = SANS, tema, onToggleT
         </svg>
         <span className="risco" />
         <h1>{tool}</h1>
-      </div>
+      </Marca>
+      <div className="acoes">
+      {homeHref && (
+        <a className="tema" href={homeHref} aria-label="Voltar ao menu de ferramentas" title="Todas as ferramentas">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3.5" y="3.5" width="7" height="7" />
+          <rect x="13.5" y="3.5" width="7" height="7" />
+          <rect x="3.5" y="13.5" width="7" height="7" />
+          <rect x="13.5" y="13.5" width="7" height="7" />
+        </svg>
+        </a>
+      )}
       <button
         className="tema"
         onClick={onToggleTema}
@@ -54,6 +70,7 @@ export default function Header({ tool, theme, fontFamily = SANS, tema, onToggleT
           )}
         </svg>
       </button>
+      </div>
     </div>
   );
 }
