@@ -2,8 +2,9 @@ import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import Header from "./components/Header.jsx";
 import { MONO, SANS } from "./theme.js";
 
-/* Menu do hub de ferramentas (projeto "hub" ao lado). Em dev aponta pro servidor local. */
-const HUB_URL = import.meta.env.DEV ? "http://localhost:5180/" : "https://design-tools-gugaxd.vercel.app/";
+/* Esta é a versão independente; o botão do cabeçalho leva ao hub publicado.
+   A cópia que vai ao ar vive em graphic-design-hub, servida em /bento-maker/. */
+const HUB_URL = "https://gh-the-hub.vercel.app/";
 
 /* Tokens de cor lidos via var() — o Header fica em sincronia com o
    alternador de tema do próprio .bt, sem duplicar a paleta escuro/claro. */
@@ -119,6 +120,18 @@ const CSS = `
 
 /* --- painéis --- */
 .bt .corpo { display:flex; flex:1; min-height:0; }
+/* Cabeçalho: o nome encolhe antes de encostar nos botões, e a barra de rolagem
+   do painel é fina para não roubar largura do nome. */
+.brand .marca{gap:9px}
+div.brand{gap:8px}
+.brand .acoes{gap:4px}
+.marca { flex:0 1 auto; min-width:0; }
+.brand h1 { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bt .painel { scrollbar-width:thin; scrollbar-color: var(--line) transparent; }
+.bt .painel::-webkit-scrollbar { width:8px; }
+.bt .painel::-webkit-scrollbar-thumb { background: var(--line); border-radius:2px; }
+.bt .painel::-webkit-scrollbar-track { background: transparent; }
+
 .bt .painel {
   width: var(--painel); flex:none; overflow-y:auto;
   background: var(--ink2); border-right:1px solid var(--line);
@@ -252,11 +265,11 @@ const CSS = `
 }
 
 /* --- blocos --- */
-.bt .bloco { position:absolute; overflow:hidden; background-repeat:no-repeat; }
+.bt .bloco { position:absolute; overflow:hidden; background-repeat:no-repeat;  touch-action:none; }
 .bt .pega, .bt .alca {
   position:absolute; opacity:0; background: var(--ink2); border:1px solid var(--line);
   color: var(--text); display:grid; place-items:center; padding:0;
-}
+ touch-action:none; }
 .bt .bloco:hover .pega, .bt .bloco:hover .alca,
 .bt .bloco[data-sel="1"] .pega, .bt .bloco[data-sel="1"] .alca { opacity:1; }
 .bt .pega { cursor:grab; }
@@ -264,12 +277,19 @@ const CSS = `
 .bt .alca { cursor:nwse-resize; }
 .bt .guia { position:absolute; pointer-events:none; }
 
+/* Celular e tablet em pé: o painel deixa de ser uma caixa (display:contents),
+   então o cabeçalho e o palco sobem para o topo e grudam lá, enquanto os
+   controles rolam por baixo. O overflow:hidden da raiz anularia o sticky. */
 @media (max-width: 860px) {
-  .bt { height:auto; }
-  .bt .corpo { flex-direction:column; }
-  .bt .painel { width:100%; border-right:0; border-bottom:1px solid var(--line); }
-  .bt .painel.dir { border-left:0; border-top:1px solid var(--line); }
-  .bt .palco { padding:18px; min-height:60vh; }
+  /* tablet em pé: a coluna de controles para de esticar e fica centrada */
+  .bt .painel > *:not(.brand){padding-inline:max(18px,calc((100% - 600px) / 2))}
+  .bt { height:auto; overflow:visible; }
+  .bt .corpo { display:contents; }
+  .bt .painel { display:contents; }
+  .bt .painel > * { order:1; background: var(--ink2); width:100%; }
+  .bt .brand { order:-2; position:sticky; top:0; z-index:7; }
+  .bt .palco { order:-1; position:sticky; top:63px; z-index:6; height:46vh; flex:none;
+    padding:18px; min-height:0; border-bottom:1px solid var(--line); }
 }
 @media (prefers-reduced-motion: reduce) {
   .bt *, .bt *::before, .bt *::after { transition:none !important; animation:none !important; }
